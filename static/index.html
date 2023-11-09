@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+
+    <title>Document</title>
+</head>
+
+<body class="bg-gray-800 text-gray-300 container">
+
+    <div class="p-6 grid grid-cols-5 gap-4">
+
+        <div>
+            <form hx-target="#frame" hx-swap="innerHTML" hx-post="/send-message">
+                <div>
+                    <label for="message">Mensagem para o MQTT: </label>
+                    <br>
+                    <input name="message"
+                        class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                        id="message" placeholder="Mensagem...">
+                </div>
+                <br>
+                <div>
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Enviar</button>
+                </div>
+            </form>
+        </div>
+
+        <div></div>
+
+        <div>
+            <br>
+            <button hx-target="#frame" hx-swap="innerHTML" hx-post="/led1"  name="led1" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Ação 1</button>
+        </div>
+
+        <div>
+            <br>
+            <button hx-target="#frame" hx-swap="innerHTML" hx-post="/led2"   name="led2" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Ação2</button>
+        </div>
+
+        <div hx-get="/temperature" hx-trigger="every 2s" hx-swap="innerHTML" class="text-8xl">
+            25ºC
+        </div>
+
+    </div>
+
+    <iframe style="display: none;" id="frame" name="frame"></iframe>
+</body>
+
+</html>
