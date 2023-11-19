@@ -35,7 +35,7 @@
 
 <body class="bg-gray-800 text-gray-300 container">
 
-    <div class="p-6 grid grid-cols-5 gap-4">
+    <div class="p-6 grid grid-cols-4 gap-4">
 
         <div>
             <form hx-target="#frame" hx-swap="innerHTML" hx-post="/send-message">
@@ -62,13 +62,13 @@
             <div id="led1" class="led false"></div>  
       </div>
 
-        <div>
+      <!--   <div>
             <br>
-            <button hx-trigger="click"   hx-target="#led2" hx-swap="outerHTML" hx-post="/led2"   name="led2" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Led 2 </button>
+            <button hx-trigger="click"   hx-target="#led2" hx-swap="outerhtml" hx-post="/led2"   name="led2" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> led 2 </button>
             <div id="led2" class="led false"></div>  
       </div>
-
-        <div hx-get="/temperature" hx-trigger="every 3s" hx-swap="innerHTML" class="text-8xl">
+      -->
+        <div hx-get="/sensor" hx-trigger="every 3s" hx-swap="innerHTML" class="text-8xl">
             
         </div>
 

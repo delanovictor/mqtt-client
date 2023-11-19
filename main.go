@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -11,6 +12,7 @@ import (
 
 type State struct {
 	temperature string
+	humidity    string
 	led1        bool
 	led2        bool
 }
@@ -43,7 +45,10 @@ func main() {
 	state.temperature = "-"
 	go client.Subscribe("delano_e_mauro", 0, func(_ mqtt.Client, msg mqtt.Message) {
 		fmt.Printf("* [%s] %s\n", msg.Topic(), string(msg.Payload()))
-		state.temperature = string(msg.Payload())
+		payload := strings.Split(string(msg.Payload()), ",")
+
+		state.temperature = payload[0]
+		state.humidity = payload[1]
 	})
 
 	go client.Subscribe("delano_e_mauro_2", 0, func(_ mqtt.Client, msg mqtt.Message) {
@@ -95,17 +100,18 @@ func main() {
 		fmt.Fprintf(w, `<div id="led2" class="led %t">  </div>`, state.led2)
 	})
 
-	http.HandleFunc("/temperature", func(w http.ResponseWriter, _ *http.Request) {
+	http.HandleFunc("/sensor", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 
-		fmt.Fprintf(w, "%s °c", state.temperature)
+		sendMessage(client, "3")
+		fmt.Fprintf(w, "%s °c <br><br> %s %%", state.temperature, state.humidity)
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 
-	log.Println("Listening on port 8000...")
+	log.Println("Listening on port 80...")
 
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(":80", nil))
 }
 
 func sendMessage(client mqtt.Client, message string) {
