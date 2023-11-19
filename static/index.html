@@ -35,15 +35,17 @@
 
         <div>
             <br>
-            <button hx-target="#frame" hx-swap="innerHTML" hx-post="/led1"  name="led1" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Ação 1</button>
-        </div>
+            <button hx-trigger="click" hx-target="#led1" hx-swap="outerHTML" hx-post="/led1"  name="led1" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Ação 1</button>
+            <div id="led1" class="false">false</div>  
+      </div>
 
         <div>
             <br>
-            <button hx-target="#frame" hx-swap="innerHTML" hx-post="/led2"   name="led2" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Ação2</button>
-        </div>
+            <button hx-trigger="click"   hx-target="#led2" hx-swap="outerHTML" hx-post="/led2"   name="led2" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Ação2</button>
+            <div id="led2" class="false">false</div>  
+      </div>
 
-        <div hx-get="/temperature" hx-trigger="every 2s" hx-swap="innerHTML" class="text-8xl">
+        <div hx-get="/temperature" hx-trigger="every 3s" hx-swap="innerHTML" class="text-8xl">
             25ºC
         </div>
 
