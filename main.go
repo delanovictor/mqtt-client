@@ -19,7 +19,8 @@ var state State
 
 func mqttConnect(clientId string) mqtt.Client {
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("tcp://%s", "localhost:1883"))
+	opts.AddBroker(fmt.Sprintf("tcp://%s", "broker.hivemq.com:1883"))
+	// opts.AddBroker(fmt.Sprintf("tcp://%s", "localhost:1883"))
 	opts.SetClientID(clientId)
 
 	client := mqtt.NewClient(opts)
@@ -36,19 +37,18 @@ func mqttConnect(clientId string) mqtt.Client {
 	return client
 }
 
-func mqttListen(topic string) {
-	client := mqttConnect("sub")
+func main() {
+	client := mqttConnect("go-server")
 
-	client.Subscribe(topic, 0, func(_ mqtt.Client, msg mqtt.Message) {
+	state.temperature = "-"
+	go client.Subscribe("delano_e_mauro", 0, func(_ mqtt.Client, msg mqtt.Message) {
 		fmt.Printf("* [%s] %s\n", msg.Topic(), string(msg.Payload()))
 		state.temperature = string(msg.Payload())
 	})
-}
 
-func main() {
-	go mqttListen("delano_e_mauro")
-
-	client := mqttConnect("go-server")
+	go client.Subscribe("delano_e_mauro_2", 0, func(_ mqtt.Client, msg mqtt.Message) {
+		fmt.Printf("Mensagem Enviada: [%s] %s\n", msg.Topic(), string(msg.Payload()))
+	})
 
 	http.HandleFunc("/send-message", func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
@@ -75,7 +75,7 @@ func main() {
 
 		sendMessage(client, message)
 
-		fmt.Fprintf(w, `<div id="led1" class="%t"> %t </div>`, state.led1, state.led1)
+		fmt.Fprintf(w, `<div id="led1" class="led %t">  </div>`, state.led1)
 	})
 
 	http.HandleFunc("/led2", func(w http.ResponseWriter, _ *http.Request) {
@@ -92,26 +92,24 @@ func main() {
 
 		sendMessage(client, message)
 
-		fmt.Fprintf(w, `<div id="led2" class="%t"> %t </div>`, state.led2, state.led2)
+		fmt.Fprintf(w, `<div id="led2" class="led %t">  </div>`, state.led2)
 	})
 
 	http.HandleFunc("/temperature", func(w http.ResponseWriter, _ *http.Request) {
-		fmt.Println("Temperature: ", state.temperature)
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(state.temperature))
+
+		fmt.Fprintf(w, "%s °c", state.temperature)
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 
-	log.Println("Listening on port 8080...")
+	log.Println("Listening on port 8000...")
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
 func sendMessage(client mqtt.Client, message string) {
-	topic := "delano_e_mauro2"
+	topic := "delano_e_mauro_2"
 
-	r := client.Publish(topic, 0, false, message)
-
-	fmt.Println(r)
+	client.Publish(topic, 0, false, message)
 }
